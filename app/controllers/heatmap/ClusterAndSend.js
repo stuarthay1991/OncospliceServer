@@ -11,7 +11,7 @@ async function clusterDataAndSend(res, queryResult, generatedUUID, outputObject)
 	var colBeds = [];
 	var colBedsIndex = 0;
 
-	console.log("queryRESULT:", queryResult.rows.length);
+	//console.log("queryRESULT:", queryResult.rows.length);
 	if(queryResult.rows.length <= 1)
 	{
 		res.send("Error");
@@ -43,7 +43,7 @@ async function clusterDataAndSend(res, queryResult, generatedUUID, outputObject)
 			}
 		}
 
-		console.log("i found the cols", colBeds);
+		//console.log("i found the cols", colBeds);
 
 		for(let i = 0; i < colBeds.length; i++)
 		{
@@ -94,7 +94,8 @@ async function clusterDataAndSend(res, queryResult, generatedUUID, outputObject)
 		var clusteredHeatmapArray = [];
 
 		var os = new os_func();
-		var clusterCommand = "python HC_only_circa_v1.py --i ".concat(resultBoxFileName.concat(".txt")).concat(" --row_method ward --column_method ward --row_metric cosine --column_metric cosine --normalize True 2>&1 &");
+		var clusterCommand = "conda activate py27; python HC_only_circa_v1.py --i ".concat(resultBoxFileName.concat(".txt")).concat(" --row_method ward --column_method ward --row_metric cosine --column_metric cosine --normalize True 2>&1 &");
+		console.log(clusterCommand);
 		os.execCommand(clusterCommand, function (returnvalue) {
 			//console.log("funkypants", returnvalue);
 			var readStream = fs.createReadStream((resultBoxFileName.concat("-clustered.txt")));

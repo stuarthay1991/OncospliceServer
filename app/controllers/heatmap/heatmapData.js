@@ -14,7 +14,7 @@ async function heatmapData(req, res, next){
 			var outputObject = {};
 			//Change this to fileless database format.
 			console.log("reqdata", req.body.data);
-			var oncoSpliceClusterPath = "oncoclusters/".concat(req.body.data.cancerName).concat("_MergedResult.txt");
+			var oncoSpliceClusterPath = "neo_oncoclusters/".concat(req.body.data.cancerName).concat("_MergedResult.txt");
 			var heatmapQueries = setUpHeatmapQuery(req.body.data);
 
 			//Oncosplice Clustering map signature to oncosplice cluster
@@ -24,7 +24,11 @@ async function heatmapData(req, res, next){
 			var oncospliceClustersFileIterator = 0;
 			if(heatmapQueries.oncospliceClusterQuery.key != undefined)
 			{
-	    		var oncoSpliceClusterContents = fs.readFileSync(oncoSpliceClusterPath, 'utf-8');
+	    		var h_key = heatmapQueries.oncospliceClusterQuery.key[0];
+				console.log("h_key", h_key);
+				h_key = h_key.replace(/-/g, "_");
+				console.log("h_key", h_key);
+				var oncoSpliceClusterContents = fs.readFileSync(oncoSpliceClusterPath, 'utf-8');
 	    		oncoSpliceClusterContents.split(/\r?\n/).forEach(line =>  {
 	    			if(oncospliceClustersFileIterator == 0)
 	    			{
@@ -32,7 +36,12 @@ async function heatmapData(req, res, next){
 	    				oncospliceClustersFileHeader = oncospliceClustersFileHeader.split("\t");
 	    				for(let i = 0; i < oncospliceClustersFileHeader.length; i++)
 	    				{
-							if(oncospliceClustersFileHeader[i] == heatmapQueries.oncospliceClusterQuery.key)
+							var h_id = oncospliceClustersFileHeader[i];
+							h_id = h_id.replace("-", "_");
+							h_id = h_id.replace(":", "_");
+							h_id = h_id.toLowerCase()
+							console.log("h_id, h_key", h_id, h_key);
+							if(h_id == h_key)
 							{
 								oncospliceClustersIndex = i;
 								break;
@@ -41,6 +50,7 @@ async function heatmapData(req, res, next){
 	    				if(oncospliceClustersIndex == "NA"){
 							console.log("oncooncoonco", heatmapQueries.oncospliceClusterQuery);
 	    					var newKey = heatmapQueries.oncospliceClusterQuery.key[0].replace("_", " ");
+							//var newKey = heatmapQueries.oncospliceClusterQuery.key[0].replace("_", "-");
 		    				for(let i = 0; i < oncospliceClustersFileHeader.length; i++)
 		    				{
 								if(oncospliceClustersFileHeader[i] == newKey)
@@ -58,6 +68,8 @@ async function heatmapData(req, res, next){
 						{
 							let oncospliceClustersFileLine = line.split("\t");
 							let rowLabel = oncospliceClustersFileLine[0].replace(/\.|\-/g, "_").toLowerCase();
+							rowLabel = rowLabel.slice(0, 16);
+							console.log("rowLabel", rowLabel);
 							oncospliceClustersDict[rowLabel] = oncospliceClustersFileLine[oncospliceClustersIndex];
 						}
 	    			}
@@ -113,6 +125,7 @@ async function heatmapData(req, res, next){
 				{
 					//Strings have to be edited in order to be matched
 					var parsedSample = (sampleResultArr[i].replace(/\.|\-/g, "_")).toLowerCase();
+					parsedSample = parsedSample.slice(0, -4);
 
 					//Add to query string
 					if(parsedSample != 'na' && parsedSample != '')
@@ -199,6 +212,7 @@ async function heatmapData(req, res, next){
 
 			var generatedUUID = uuid.v4();
 			
+			//console.log("onions", res, queryResult, generatedUUID, outputObject);
 			clusterDataAndSend(res, queryResult, generatedUUID, outputObject);
 
 		}

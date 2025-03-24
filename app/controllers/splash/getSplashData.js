@@ -1,6 +1,6 @@
-const { dbCredentials } = require("../config/oncodb.config.js");
-const { databaseQueryHelper } = require("./databasequeryhelper.js");
-const { getCancerNames } = require("../utilities/getCancerNames.js")
+const { dbCredentials } = require("../../config/oncodb.config.js");
+const { databaseQueryHelper } = require("../databasequeryhelper.js");
+const { getCancerNames } = require("../../utilities/getCancerNames.js");
 
 function getUniqueElements(arr) {
     return [...new Set(arr)];
@@ -48,7 +48,7 @@ async function getSplashData(req, res, next){
 
         //console.log(parsedTableName)
         // Split at "_" and take the first part
-        if(parsedTableName != "supersig" && parsedTableName != "sigtranslate" && parsedTableName != "hs"){
+        if(parsedTableName != "gtex" && parsedTableName != "supersig" && parsedTableName != "sigtranslate" && parsedTableName != "survival" && parsedTableName != "cluster_annotation"){
           //console.log(parsedTableName);
           tableNamesSet.add(parsedTableName);
         }

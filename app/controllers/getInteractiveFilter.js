@@ -13,6 +13,7 @@ async function getInteractiveFilter(req, res, next){
 			var outputArray = {};
 			var iSet = 0;
 			var clinicalMetaDataQuery = "SELECT ".concat(selectedFilterName.toLowerCase()).concat(", uid ").concat(queryHelperMap["META"]["QUERY"]);
+			console.log("clinicalMetaDataQuery", clinicalMetaDataQuery);
 			var clinicalMetaDataResult = await dbCredentials.query(clinicalMetaDataQuery);
 
 			clinicalMetaDataResult.rows.forEach(row => {
@@ -41,6 +42,7 @@ async function getInteractiveFilter(req, res, next){
 			outputObject["set"] = set;
 			outputObject["out"] = outputArray;
 			outputObject["color"] = colorMatchArray;
+			console.log("clinicalMetaDataQuery output object", outputObject);
 			res.send(outputObject);
 		}
 		catch(error){

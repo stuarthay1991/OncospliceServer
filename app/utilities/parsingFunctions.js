@@ -21,8 +21,8 @@ function cleanUpTranslator(inputString){
 
 function convertToUnderscores(inputString){
 	inputString = inputString.replace(/\.|\-|\(/g, "_");
-	inputString = inputString.replace(/)\s/g, "__");
-	inputString = inputString.replace(/)/g, "_");
+	inputString = inputString.replace(/\s/g, "__");
+	inputString = inputString.replace(/\)/g, "_");
 	return inputString;
 }
 

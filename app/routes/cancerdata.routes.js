@@ -1,6 +1,14 @@
 const { samples } = require("../controllers/samples");
 const { signatures } = require("../controllers/signatures");
 const { heatmapData } = require("../controllers/heatmap/heatmapData");
+
+const { collectSignatures } = require("../controllers/splash/collectSignatures");
+const { collectSignaturesPerCancer } = require("../controllers/splash/collectSignaturesPerCancer");
+const { collectSamples } = require("../controllers/splash/collectSamples");
+const { getSplashData } = require("../controllers/splash/getSplashData");
+const { getNovelSplicingEvents } = require("../controllers/splash/getNovelSplicingEvents");
+const { annotationToSignature } = require("../controllers/splash/annotationToSignature");
+
 const { getSingleUidData } = require("../controllers/getSingleUidData");
 const { getGtexData } = require("../controllers/getGtexData");
 const { cbioportalCurlCommand } = require("../controllers/cbioportalCurlCommand");
@@ -16,7 +24,9 @@ const { createPdf } = require("../controllers/createPdf");
 const { createPdfHeatmap } = require("../controllers/createPdfHeatmap");
 const { createPlotlyPdf } = require("../controllers/createPlotlyPdf");
 const { getDoubleBarChartData } = require("../controllers/doubleBarChart");
-const { getSplashData } = require("../controllers/getSplashData");
+const { getMajorTable } = require("../controllers/updateMajorTable");
+const { getMinorTable } = require("../controllers/updateMinorTable");
+
 const cors = require("cors");
 
 module.exports = app => {
@@ -45,6 +55,15 @@ module.exports = app => {
     router.post("/createPdfHeatmap", createPdfHeatmap);
     router.post("/createPlotlyPdf", createPlotlyPdf);
     router.post("/getdoublebarchartdata", getDoubleBarChartData);
-    router.post("/getsplashdata", getSplashData);
+    router.post("/updatemajortable", getMajorTable);
+    router.post("/updateminortable", getMinorTable);
+
+    router.post("/splash/getData", getSplashData);
+    router.post("/splash/getNovelSplicingEvents", getNovelSplicingEvents);
+    router.post("/splash/collectSignature", collectSignatures);
+    router.post("/splash/collectSignaturesPerCancer", collectSignaturesPerCancer);
+    router.post("/splash/collectSamples", collectSamples);
+    router.post("/splash/annotationToSignature", annotationToSignature);
+
     app.use('/api/datasets', router);
 };

@@ -38,7 +38,7 @@ def heatmap(x, row_header, column_header, row_method,
             column_method, row_metric, column_metric,
             color_gradient, filename, graphics=True):
     
-    print "\nPerforming hiearchical clustering using %s for columns and %s for rows" % (column_metric,row_metric)
+    #print("\nPerforming hiearchical clustering using %s for columns and %s for rows" % (column_metric,row_metric))
 
     #### Compute and plot top dendrogram
     if column_method != None:
@@ -49,7 +49,7 @@ def heatmap(x, row_header, column_header, row_method,
         Z2 = sch.dendrogram(Y2, no_plot=True)
         ind2 = sch.fcluster(Y2,0.7*max(Y2[:,2]),'distance') ### This is the default behavior of dendrogram
         time_diff = str(round(time.time()-start_time,1))
-        print 'Column clustering completed in %s seconds' % time_diff
+        #print 'Column clustering completed in %s seconds' % time_diff
     else:
         ind2 = ['NA']*len(column_header) ### Used for exporting the flat cluster data
         
@@ -62,7 +62,7 @@ def heatmap(x, row_header, column_header, row_method,
         Z1 = sch.dendrogram(Y1, no_plot=True, orientation='right')
         ind1 = sch.fcluster(Y1,0.7*max(Y1[:,2]),'distance') ### This is the default behavior of dendrogram
         time_diff = str(round(time.time()-start_time,1))
-        print 'Row clustering completed in %s seconds' % time_diff
+        #print 'Row clustering completed in %s seconds' % time_diff
     else:
         ind1 = ['NA']*len(row_header) ### Used for exporting the flat cluster data
  
@@ -168,10 +168,10 @@ def importData(filename,normalize=False):
                 row_header.append(t[0])
                 
     time_diff = str(round(time.time()-start_time,1))
-    try:
-        print '\n%d rows and %d columns imported for %s in %s seconds...' % (len(matrix),len(column_header),dataset_name,time_diff)
-    except Exception:
-        print 'No data in input file.'; force_error
+    #try:
+        #print '\n%d rows and %d columns imported for %s in %s seconds...' % (len(matrix),len(column_header),dataset_name,time_diff)
+    #except Exception:
+        #print 'No data in input file.'; force_error
     return numpy.array(matrix), column_header, row_header
   
 if __name__ == '__main__':
@@ -193,8 +193,8 @@ if __name__ == '__main__':
     """
     ################  Comand-line arguments ################
     if len(sys.argv[1:])<=1:  ### Indicates that there are insufficient number of command-line arguments
-        print "Warning! Please designate a tab-delimited input expression file in the command-line"
-        print "Example: python hierarchical_clustering.py --i /Users/me/logfolds.txt"
+        #print "Warning! Please designate a tab-delimited input expression file in the command-line"
+        #print "Example: python hierarchical_clustering.py --i /Users/me/logfolds.txt"
         sys.exit()
     else:
         options, remainder = getopt.getopt(sys.argv[1:],'', ['i=','row_method=','column_method=',
@@ -213,7 +213,8 @@ if __name__ == '__main__':
                     normalize = False
     
             else:
-                print "Warning! Command-line argument: %s not recognized. Exiting..." % opt; sys.exit()
+                print("Warning! Command-line argument: not recognized. Exiting...")
+                sys.exit()
             
     matrix, column_header, row_header = importData(filename,normalize=normalize)
 
@@ -221,9 +222,9 @@ if __name__ == '__main__':
         try:
             heatmap(matrix, row_header, column_header, row_method, column_method, row_metric, column_metric, color_gradient, filename, graphics=graphics)
         except Exception:
-            print 'Error using %s ... trying euclidean instead' % row_metric
+            #print 'Error using %s ... trying euclidean instead' % row_metric
             row_metric = 'euclidean'
             try:
                 heatmap(matrix, row_header, column_header, row_method, column_method, row_metric, column_metric, color_gradient, filename, graphics=graphics)
             except IOError:
-                print 'Error with clustering encountered'
+                print('Error with clustering encountered')

@@ -3,7 +3,13 @@ const { cleanUpTranslator } = require("../utilities/parsingFunctions.js");
 const { databaseQueryHelper } = require("./databasequeryhelper.js");
 const { containsObject } = require("../utilities/generalFunctions.js")
 
-//This function records the number of samples that exist for a given selection.
+function translateSignatureName(name){
+	name = name.replace("psi_", "");
+	name = name.replace(/_/g, "-");
+	return name;
+  }
+
+//This function records the signatures and signature data that exist for a given selection.
 async function signatures(req, res, next){
 	if (req.method == 'POST') {
 		try{
@@ -20,11 +26,12 @@ async function signatures(req, res, next){
 				let fieldName = element["name"];
 				if(fieldName != "uid")
 				{
-					sigTranslater[fieldName] = fieldName;
+					sigTranslater[fieldName] = translateSignatureName(fieldName);
 				}
 			})
 
-			console.log("Starting signature translate query...");
+			/*console.log("Starting signature translate query...");
+			console.log(queryHelperMap["SIG"]["TRANSLATE"]);
 			const sigTranslateQuery = await dbCredentials.query(queryHelperMap["SIG"]["TRANSLATE"]);
 			//console.log(sigTranslateQuery);
 			sigTranslateQuery.rows.forEach(row => {
@@ -34,8 +41,9 @@ async function signatures(req, res, next){
 				{
 					sigTranslater[psiEventSignature] = simpleName;
 				}
-			})
+			})*/
 			//console.log(sigTranslater);
+			//outputObject["signatureTranslate"] = sigTranslater;
 			outputObject["signatureTranslate"] = sigTranslater;
 			res.send(outputObject);
 		}
