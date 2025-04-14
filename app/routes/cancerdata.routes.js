@@ -26,6 +26,8 @@ const { createPlotlyPdf } = require("../controllers/createPlotlyPdf");
 const { getDoubleBarChartData } = require("../controllers/doubleBarChart");
 const { getMajorTable } = require("../controllers/updateMajorTable");
 const { getMinorTable } = require("../controllers/updateMinorTable");
+const { getTableForHeatmapSelect } = require("../controllers/updateTableForHeatmapSelect");
+const { pancancer } = require("../controllers/pancancer");
 
 const cors = require("cors");
 
@@ -57,6 +59,8 @@ module.exports = app => {
     router.post("/getdoublebarchartdata", getDoubleBarChartData);
     router.post("/updatemajortable", getMajorTable);
     router.post("/updateminortable", getMinorTable);
+    router.post("/gettableforheatmapselect", getTableForHeatmapSelect);
+    router.post("/pancancer", pancancer);
 
     router.post("/splash/getData", getSplashData);
     router.post("/splash/getNovelSplicingEvents", getNovelSplicingEvents);
@@ -64,6 +68,7 @@ module.exports = app => {
     router.post("/splash/collectSignaturesPerCancer", collectSignaturesPerCancer);
     router.post("/splash/collectSamples", collectSamples);
     router.post("/splash/annotationToSignature", annotationToSignature);
+    
 
     app.use('/api/datasets', router);
 };

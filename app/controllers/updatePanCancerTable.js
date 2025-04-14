@@ -12,7 +12,7 @@ async function getPanTable(req, res, next){
             const queryHelperMap = databaseQueryHelper(cancerName);
             var panquerystring = queryHelperMap["PAN"]["QUERY"];
             panquerystring = "SELECT uid, event_direction, clusterid, eventannotation, coordinates, proteinpredictions, dpsi, rawp, adjp, avg_others FROM ".concat(cancerName).concat("_fullsig WHERE signature_name = '").concat(req.body.data.signature).concat("'");
-            //console.log("unhappy", panquerystring);
+            console.log("table update query", panquerystring);
             const panCancerSigResult = await dbCredentials.query(panquerystring);
             outputObject["outputdata"] = panCancerSigResult.rows;
             }

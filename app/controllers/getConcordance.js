@@ -12,18 +12,37 @@ async function getConcordance(req, res, next){
             var postedCancer = req.body.data.cancer;
             var postedType = req.body.data.type;
             var postedAnnot = req.body.data.annot;
-						console.log("req.body.data", req.body.data);
+						//console.log("req.body.data", req.body.data);
             var addOn = "";
             if(postedType == "doublebar"){
                 console.log("goifd");
             }
             else
             {
-                console.log("goifd2");
+                //console.log("goifd2");
                 addOn = "' AND eventannotation LIKE '".concat(postedAnnot);
             }
 
-            var full_cancer = getCancerNames();
+            var tableNamesQuery = "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE'";
+            var tableNamesSet = new Set();
+            var tableNamesResult = await dbCredentials.query(tableNamesQuery);
+            tableNamesResult.rows.forEach(row => {
+            var tableName = row["table_name"];
+            if(tableName != "gtex" && tableName != "supersig" && tableName != "sigtranslate" && tableName != "survival" && tableName != "cluster_annotation")
+            {
+                var parsedTableName = tableName.split("_")[0];
+                //console.log(parsedTableName)
+                // Split at "_" and take the first part
+                if(parsedTableName != "hs")
+                {
+                    tableNamesSet.add(parsedTableName.toUpperCase());
+                }
+            }
+            })
+    
+            var full_cancer = [...tableNamesSet];
+            //var full_cancer = getCancerNames();
+            
             var color_dict = {};
             for(var i = 0; i < full_cancer.length; i++)
             {
@@ -58,7 +77,7 @@ async function getConcordance(req, res, next){
             var sig1 = postedSignature;
             var canc1 = postedCancer;
             await Promise.all(promises1);
-						//console.log("cancerObject", cancerObject);
+						console.log("CALCULATE cancerObject", cancerObject, canc1);
 
             const promises2 = full_cancer.map(async cancer => {
 								//console.log("1_cancer", cancer);
@@ -69,6 +88,7 @@ async function getConcordance(req, res, next){
                     const fancypantsquery1 = fancypantsquery1_1.concat(signature).concat("' AND cancer_name = '").concat(cancer).concat(addOn).concat(fancypantsquery1_2.concat(sig1).concat("' AND cancer_name = '").concat(canc1).concat(addOn).concat("') AS common_rows"));
                     const fancyResult1 = await dbCredentials.query(fancypantsquery1);
                     //console.log("fancypantsquery1", fancypantsquery1);
+                    //console.log("fancyResult1", fancyResult1.rows[0]["count"]);
                     var fancypantsquery2_1 = "SELECT COUNT(*) FROM (SELECT firstjunc, event_direction FROM supersig WHERE signature_name = '";
                     var fancypantsquery2_2 = "' INTERSECT SELECT firstjunc, event_direction FROM supersig WHERE signature_name = '";
                     const fancypantsquery2 = fancypantsquery2_1.concat(signature).concat("' AND cancer_name = '").concat(cancer).concat(addOn).concat(fancypantsquery2_2.concat(sig1).concat("' AND cancer_name = '").concat(canc1).concat(addOn).concat("') AS common_rows2"));
@@ -78,7 +98,7 @@ async function getConcordance(req, res, next){
                     const fancypantsquery3 = fancypantsquery3_1.concat(signature).concat("' AND cancer_name = '").concat(cancer).concat(addOn).concat("') AS common_rows3");
                     const fancyResult3 = await dbCredentials.query(fancypantsquery3);
 										//console.log("fancyResult1", fancyResult1);
-                    if(fancyResult1.rows[0]["count"] > (postedType == "doublebar" ? 20 : 10))
+                    if(fancyResult1.rows[0]["count"] > (postedType == "doublebar" ? 150 : 75))
                     {
                         outputObject[signature] = {};
                         outputObject[signature]["concordance"] = fancyResult2.rows[0]["count"] / fancyResult1.rows[0]["count"];
