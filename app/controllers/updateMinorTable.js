@@ -74,21 +74,21 @@ async function getMinorTable(req, res, next){
                     var panquerystring = "SELECT uid, gene, signature_name, eventannotation, coordinates, dpsi, rawp, adjp FROM ".concat(cancer).concat("_fullsig");
                     if(currentGene != "None")
                     {
-                        var panquerystring = panquerystring.concat(" WHERE gene = '").concat(currentGene).concat("'");
+                        panquerystring = panquerystring.concat(" WHERE gene = '").concat(currentGene).concat("'");
                     }
                     if(currentCoord != "None")
                     {
-                        var panquerystring = panquerystring.concat(" WHERE coordinates LIKE '").concat(currentCoord).concat("%'");
+                        panquerystring = panquerystring.concat(" WHERE coordinates LIKE '").concat(currentCoord).concat("%'");
                     }
                     if(currentAnnotation != "None")
                     {
                         if(currentCoord == "None" && currentGene == "None")
                         {
-                            var panquerystring = panquerystring.concat(" WHERE (");
+                            panquerystring = panquerystring.concat(" WHERE (");
                         }
                         else
                         {
-                            var panquerystring = panquerystring.concat(" AND (");
+                            panquerystring = panquerystring.concat(" AND (");
                         }
                     }
                     if(currentAnnotation != "None" && annotationSignatureMatchObject.length > 0)
@@ -103,7 +103,7 @@ async function getMinorTable(req, res, next){
                         }
                         panquerystring = panquerystring.concat(annotationToAdd).concat(")");
                     }
-                    console.log("unhappy", panquerystring);    
+                    console.log("unhappy full", panquerystring);    
                     var fullResult = await dbCredentials.query(panquerystring);
                         for(let i = 0; i < fullResult.rows.length; i++)
                         {
@@ -126,6 +126,7 @@ async function getMinorTable(req, res, next){
                         }
                 })
                 await Promise.all(promises1);
+                //console.log("reultbox", resultBox);
                 outputObject["outputdata"] = resultBox;
                 outputObject["totalentries"] = 999;
                 outputObject["clusterAnnotationDictionary"] = clusterAnnotationObject;
@@ -134,14 +135,25 @@ async function getMinorTable(req, res, next){
             else
             {
                 var resultBox = []
-                //var panquerystring = "SELECT uid, gene, signature_name, eventannotation, coordinates, dpsi, rawp, adjp FROM ".concat(cancerName).concat("_fullsig").concat(" WHERE gene = '").concat(currentGene).concat("'");
+                var panquerystring = "SELECT uid, gene, signature_name, eventannotation, coordinates, dpsi, rawp, adjp FROM ".concat(cancerName).concat("_fullsig");
                 if(currentGene != "None")
                 {
-                    var panquerystring = "SELECT uid, gene, signature_name, eventannotation, coordinates, dpsi, rawp, adjp FROM ".concat(cancerName).concat("_fullsig").concat(" WHERE gene = '").concat(currentGene).concat("'");
+                    panquerystring = panquerystring.concat(" WHERE gene = '").concat(currentGene).concat("'");
                 }
-                else
+                if(currentCoord != "None")
                 {
-                    var panquerystring = "SELECT uid, gene, signature_name, eventannotation, coordinates, dpsi, rawp, adjp FROM ".concat(cancerName).concat("_fullsig").concat(" WHERE coordinates LIKE '%").concat(currentCoord).concat("%'");
+                    panquerystring = panquerystring.concat(" WHERE coordinates LIKE '").concat(currentCoord).concat("%'");
+                }
+                if(currentAnnotation != "None")
+                {
+                    if(currentCoord == "None" && currentGene == "None")
+                    {
+                        panquerystring = panquerystring.concat(" WHERE (");
+                    }
+                    else
+                    {
+                        panquerystring = panquerystring.concat(" AND (");
+                    }
                 }
                 if(currentAnnotation != "None" && annotationSignatureMatchObject.length > 0)
                 {
@@ -153,7 +165,7 @@ async function getMinorTable(req, res, next){
                             annotationToAdd = annotationToAdd.concat(" OR signature_name = '").concat(annotationSignatureMatchObject[i]).concat("'");
                         }
                     }
-                    panquerystring = panquerystring.concat(" AND (").concat(annotationToAdd).concat(")");
+                    panquerystring = panquerystring.concat(annotationToAdd).concat(")");
                 }
                 console.log("unhappy", panquerystring);    
                 var fullResult = await dbCredentials.query(panquerystring);
