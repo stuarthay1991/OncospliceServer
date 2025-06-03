@@ -9,10 +9,14 @@ async function getVennData(req, res, next){
 		try{
 			var postedComparedSignature = req.body.data.comparedSignature;
             var postedHomeSignature = req.body.data.homeSignature;
-            var postedHomeCancer = req.body.data.cancer;
+            var postedHomeCancer = req.body.data.cancer.toLowerCase();
             var postedType = req.body.data.type;
             var postedAnnot = req.body.data.annot;
             //string parsing
+
+            console.log("Venn setup", postedComparedSignature, postedHomeSignature, postedHomeCancer, postedType, postedAnnot);
+
+            postedComparedSignature = postedComparedSignature.substring(postedComparedSignature.indexOf('_') + 1);
 
             var annotString = "";
             if(postedAnnot != "none")
@@ -23,18 +27,21 @@ async function getVennData(req, res, next){
             var firstOccurence = postedComparedSignature.indexOf("_");
             var secondOccurence = postedComparedSignature.indexOf("_", firstOccurence+1);
             var comparedSignature = postedComparedSignature.substring(secondOccurence+1);
-            var comparedCancer = postedComparedSignature.substring(0, secondOccurence);
+            var comparedSignature = postedComparedSignature;
+            var comparedCancer = postedComparedSignature.substring(firstOccurence+1, secondOccurence);
 
             var initInterQ1 = "SELECT uid, firstjunc, event_direction FROM supersig WHERE signature_name = '";
             var initInterQ2 = "' INTERSECT SELECT uid, firstjunc, event_direction FROM supersig WHERE signature_name = '";
-            const intersectionQuery = initInterQ1.concat(postedHomeSignature).concat("' AND cancer_name = '").concat(postedHomeCancer).concat(initInterQ2.concat(comparedSignature).concat("' AND cancer_name = '").concat(comparedCancer).concat("'"));
+            const intersectionQuery = initInterQ1.concat(postedHomeSignature).concat("' AND cancer_name = '").concat(postedHomeCancer.toUpperCase()).concat(initInterQ2.concat(postedComparedSignature).concat("' AND cancer_name = '").concat(comparedCancer.toUpperCase()).concat("'"));
+            console.log("intersectionQuery", intersectionQuery);
             const intersectionResult = await dbCredentials.query(intersectionQuery);
             var uidgroup3 = [];
             for(var i = 0; i < intersectionResult.rows.length; i++)
             {
                 uidgroup3.push(intersectionResult.rows[i]["uid"]);
             }
-            if(comparedCancer == "HNSCC" || comparedCancer == "GBM")
+            
+            /*if(comparedCancer == "HNSCC" || comparedCancer == "GBM")
             {
                 firstOccurence = comparedSignature.indexOf("_");
                 secondOccurence =comparedSignature.indexOf("_", firstOccurence+1);
@@ -49,7 +56,8 @@ async function getVennData(req, res, next){
                 secondOccurence =comparedSignature.indexOf("_", firstOccurence+1);
                 comparedSignature = comparedSignature.substring(secondOccurence+1);
                 comparedSignature = "psi_".concat(comparedSignature);
-            }
+            }*/
+
             var outputDat = [];
             if(postedType == "home")
             {
@@ -61,7 +69,7 @@ async function getVennData(req, res, next){
                 {
                     uidgroup1.push(homeSignatureResult.rows[i]["uid"]);
                 }*/
-                var initialQuery1 = "SELECT uid, event_direction, clusterid, eventannotation, coordinates, proteinpredictions, dpsi, rawp, adjp, avg_others FROM blca_fullsig WHERE signature_name = '";
+                var initialQuery1 = "SELECT uid, event_direction, clusterid, eventannotation, coordinates, proteinpredictions, dpsi, rawp, adjp, avg_others FROM ".concat(postedHomeCancer.toLowerCase()).concat("_fullsig WHERE signature_name = '");
                 var signatureUIDSforHomeSigQuery = initialQuery1.concat(postedHomeSignature).concat(annotString).concat("' AND (");
                 for(let i = 0; i < uidgroup3.length; i++)
                 {
@@ -74,7 +82,9 @@ async function getVennData(req, res, next){
                         signatureUIDSforHomeSigQuery = signatureUIDSforHomeSigQuery.concat("uid != ").concat("'").concat(uidgroup3[i]).concat("')");
                     }
                 }
+                console.log("signatureUIDSforHomeSigQuery", signatureUIDSforHomeSigQuery);
                 const homeSignatureResult2 = await dbCredentials.query(signatureUIDSforHomeSigQuery);
+                console.log("homeSignatureResult2", homeSignatureResult2);
                 outputDat = homeSignatureResult2;
             }
             else if(postedType == "compared")
@@ -92,7 +102,7 @@ async function getVennData(req, res, next){
                     uidgroup2.push(comparedSignatureResult.rows[i]["uid"]);
                 }*/
                 var initialQuery2 = "SELECT uid, event_direction, clusterid, eventannotation, coordinates, proteinpredictions, dpsi, rawp, adjp, avg_others FROM ";
-                var signatureUIDSforCompSigQuery = initialQuery2.concat(comparedCancer).concat("_fullsig WHERE signature_name = '").concat(comparedSignature).concat(annotString).concat("' AND (");
+                var signatureUIDSforCompSigQuery = initialQuery2.concat(comparedCancer.toLowerCase()).concat("_fullsig WHERE signature_name = '").concat(comparedSignature).concat(annotString).concat("' AND (");
                 for(let i = 0; i < uidgroup3.length; i++)
                 {
                     if(i != (uidgroup3.length - 1))
@@ -104,11 +114,12 @@ async function getVennData(req, res, next){
                         signatureUIDSforCompSigQuery = signatureUIDSforCompSigQuery.concat("uid != ").concat("'").concat(uidgroup3[i]).concat("')");
                     }
                 }
+                console.log("signatureUIDSforCompSigQuery", signatureUIDSforCompSigQuery);
                 const comparedSignatureResult2 = await dbCredentials.query(signatureUIDSforCompSigQuery);
                 outputDat = comparedSignatureResult2;
             }
             else{
-                var initialQuery3 = "SELECT uid, event_direction, clusterid, eventannotation, coordinates, proteinpredictions, dpsi, rawp, adjp, avg_others FROM blca_fullsig WHERE signature_name = '";
+                var initialQuery3 = "SELECT uid, event_direction, clusterid, eventannotation, coordinates, proteinpredictions, dpsi, rawp, adjp, avg_others FROM ".concat(postedHomeCancer.toLowerCase()).concat("_fullsig WHERE signature_name = '");
                 var signatureUIDSforIntersectionQuery = initialQuery3.concat(postedHomeSignature).concat(annotString).concat("' AND (");
                 for(let i = 0; i < uidgroup3.length; i++)
                 {

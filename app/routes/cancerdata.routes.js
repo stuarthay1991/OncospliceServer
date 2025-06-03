@@ -63,6 +63,7 @@ module.exports = app => {
     router.post("/pancancer", pancancer);
 
     router.post("/splash/getData", getSplashData);
+    router.get("/splash/getData", getSplashData);
     router.post("/splash/getNovelSplicingEvents", getNovelSplicingEvents);
     router.post("/splash/collectSignature", collectSignatures);
     router.post("/splash/collectSignaturesPerCancer", collectSignaturesPerCancer);

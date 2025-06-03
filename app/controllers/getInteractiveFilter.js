@@ -14,7 +14,24 @@ async function getInteractiveFilter(req, res, next){
 			var iSet = 0;
 			var clinicalMetaDataQuery = "SELECT ".concat(selectedFilterName.toLowerCase()).concat(", uid ").concat(queryHelperMap["META"]["QUERY"]);
 			console.log("clinicalMetaDataQuery", clinicalMetaDataQuery);
-			var clinicalMetaDataResult = await dbCredentials.query(clinicalMetaDataQuery);
+
+			try {
+				var clinicalMetaDataResult = await dbCredentials.query(clinicalMetaDataQuery);
+			} catch (queryError) {
+				console.error("Database query failed:", queryError);
+				var cancernameconcat = "'".concat(cancerType.toLowerCase()).concat("_").concat("meta").concat("'");
+				var intermediateQuery = "SELECT column_name FROM information_schema.columns WHERE table_name = ".concat(cancernameconcat).concat(" AND table_schema = 'public' ORDER BY ordinal_position LIMIT 2");
+				var intermediateResult = await dbCredentials.query(intermediateQuery);
+				console.log("intermediateResult", intermediateResult);
+				var newFilterName = intermediateResult.rows[1].column_name;
+				var newFilterQuery = "SELECT ".concat(newFilterName).concat(", uid ").concat(queryHelperMap["META"]["QUERY"]);
+				var clinicalMetaDataResult = await dbCredentials.query(newFilterQuery);
+			}
+			//When the above query fails, it's necessary to select the first available column in the metadata and use that instead
+			/*var cancernameconcat = "'".concat(cancerType.toLowerCase()).concat("_").concat("meta").concat("'");
+			"SELECT column_name FROM information_schema.columns WHERE table_name = ".concat(cancernameconcat).concat(" AND table_schema = 'public' ORDER BY ordinal_position LIMIT 2");*/
+		
+
 
 			clinicalMetaDataResult.rows.forEach(row => {
 				var str_edit = (row['uid'].replace(/\.|\-/g, "_")).toLowerCase();

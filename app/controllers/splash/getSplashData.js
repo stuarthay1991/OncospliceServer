@@ -33,7 +33,7 @@ function returnArray(arr) {
 }
 
 async function getSplashData(req, res, next){
-	if (req.method == 'POST') {
+	if (req.method == 'POST' || req.method == 'GET') {
 		try{
       var outputObject = {};
 			var postedData = req.body.data;
@@ -48,7 +48,7 @@ async function getSplashData(req, res, next){
 
         //console.log(parsedTableName)
         // Split at "_" and take the first part
-        if(parsedTableName != "gtex" && parsedTableName != "supersig" && parsedTableName != "sigtranslate" && parsedTableName != "survival" && parsedTableName != "cluster_annotation"){
+        if(parsedTableName != "cluster" && parsedTableName != "hs" && parsedTableName != "gtex" && parsedTableName != "supersig" && parsedTableName != "sigtranslate" && parsedTableName != "survival" && parsedTableName != "cluster_annotation"){
           //console.log(parsedTableName);
           tableNamesSet.add(parsedTableName);
         }

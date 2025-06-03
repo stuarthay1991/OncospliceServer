@@ -71,7 +71,7 @@ async function getTableForHeatmapSelect(req, res, next){
                 {
                     var obj = {};
                     obj["signature_name"] = plainCancerLookResult.rows[i]["original"];
-                    obj["datagroup"] = singleCancerLookResult.rows[i]["datagroup"];
+                    obj["datagroup"] = plainCancerLookResult.rows[i]["datagroup"];
                     obj["annotation"] = plainCancerLookResult.rows[i]["annotation"];
                     obj["cancer_name"] = cancerName.toLowerCase();
                     resultBox.push(obj);
